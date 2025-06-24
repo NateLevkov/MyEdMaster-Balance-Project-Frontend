@@ -281,6 +281,19 @@
             color: #155724;
         }
 
+        .page-toggle {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .page-toggle p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -331,6 +344,11 @@
             <button type="button" id="registerBtn">
                 <span id="registerBtnText">Register</span>
             </button>
+
+            <div class="page-toggle">
+                <p>Already have a Study ID?</p>
+                <button class="nav-btn" onclick="showLoginPage()">Go to Login</button>
+            </div>
         </div>
 
         <!-- User ID Display -->
@@ -373,8 +391,9 @@
                 <span id="loginBtnText">Login</span>
             </button>
             
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="nav-btn" onclick="showRegistration()">New Participant</button>
+            <div class="page-toggle">
+                <p>New to the study?</p>
+                <button class="nav-btn" onclick="showRegistrationPage()">Register Here</button>
             </div>
         </div>
 
@@ -440,13 +459,14 @@
     </div>
 
     <script>
-        // API Configuration - UPDATE THESE URLS TO YOUR BACKEND
-        const API_BASE_URL = 'myedmaster-balance-project-production.up.railway.app/api' // Replace with your actual API URL
+        // API Configuration - FIXED: Added https://
+        const API_BASE_URL = 'https://myedmaster-balance-project-production.up.railway.app/api';
         const API_ENDPOINTS = {
             register: `${API_BASE_URL}/register`,
             login: `${API_BASE_URL}/login`,
             entries: `${API_BASE_URL}/entries`,
-            userStats: `${API_BASE_URL}/user-stats`
+            userStats: `${API_BASE_URL}/user-stats`,
+            health: `${API_BASE_URL}/health`
         };
 
         // Demo mode flag - set to false when you have a real backend
@@ -506,6 +526,24 @@
             }
         }
 
+        // Navigation functions
+        function showRegistrationPage() {
+            showPage('registrationPage');
+        }
+
+        function showLoginPage() {
+            showPage('loginPage');
+        }
+
+        function goToLogin() {
+            showPage('loginPage');
+        }
+
+        function logout() {
+            currentUser = null;
+            showPage('loginPage');
+        }
+
         // API functions
         async function apiCall(endpoint, method = 'GET', data = null) {
             if (DEMO_MODE) {
@@ -531,7 +569,8 @@
                 const response = await fetch(endpoint, options);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
 
                 return await response.json();
@@ -595,15 +634,18 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/health`);
+                const response = await fetch(API_ENDPOINTS.health);
                 if (response.ok) {
                     statusDiv.textContent = '🟢 Connected to research database';
                     statusDiv.className = 'connection-status online';
                     return true;
+                } else {
+                    throw new Error('Health check failed');
                 }
             } catch (error) {
                 statusDiv.textContent = '🔴 Cannot connect to research database';
                 statusDiv.className = 'connection-status offline';
+                console.error('Connection check failed:', error);
                 return false;
             }
         }
@@ -632,8 +674,7 @@
                     userId: userId,
                     age: parseInt(age),
                     gender: gender,
-                    password: password,
-                    createdAt: new Date().toISOString()
+                    password: password
                 };
                 
                 const response = await apiCall(API_ENDPOINTS.register, 'POST', userData);
@@ -653,7 +694,7 @@
                 }
             } catch (error) {
                 console.error('Registration failed:', error);
-                showMessage('Registration failed. Please try again.', 'error');
+                showMessage(error.message || 'Registration failed. Please try again.', 'error');
             } finally {
                 setButtonLoading('registerBtn', 'registerBtnText', false);
             }
@@ -694,7 +735,7 @@
                 }
             } catch (error) {
                 console.error('Login failed:', error);
-                showMessage('Invalid Study ID or Password', 'error');
+                showMessage(error.message || 'Invalid Study ID or Password', 'error');
             } finally {
                 setButtonLoading('loginBtn', 'loginBtnText', false);
             }
@@ -752,7 +793,6 @@
             
             try {
                 const entryData = {
-                    userId: currentUser.userId,
                     date: getCurrentDate(),
                     time: getCurrentTime(),
                     timestamp: new Date().toISOString(),
@@ -777,7 +817,7 @@
                 if (error.message.includes('limit')) {
                     showMessage('You have reached the daily entry limit. Come back tomorrow!', 'error');
                 } else {
-                    showMessage('Failed to log exercise. Please try again.', 'error');
+                    showMessage(error.message || 'Failed to log exercise. Please try again.', 'error');
                 }
             } finally {
                 setButtonLoading('submitEntryBtn', 'submitEntryBtnText', false);
@@ -806,42 +846,30 @@
             URL.revokeObjectURL(url);
         }
 
-        function goToLogin() {
-            showPage('loginPage');
-        }
-
-        function showRegistration() {
-            showPage('registrationPage');
-        }
-
-        function logout() {
-            currentUser = null;
-            showPage('loginPage');
-        }
-
         // Initialize app
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Initializing Balance Research App...');
             
             // Check connection status
-            await checkConnection();
+            const isConnected = await checkConnection();
             
             // Set up event handlers
             document.getElementById('registerBtn').addEventListener('click', handleRegistration);
             document.getElementById('loginBtn').addEventListener('click', handleLogin);
             document.getElementById('entryForm').addEventListener('submit', handleEntrySubmission);
             
-            // Show initial page
-            showPage('registrationPage');
+            // Show initial page - start with login for returning users
+            showPage('loginPage');
             
-            // Display researcher instructions
+            // Display connection status
             if (DEMO_MODE) {
                 console.log('=== DEMO MODE ACTIVE ===');
                 console.log('Demo login: ID=P-1234, Password=demo123');
                 console.log('Replace DEMO_MODE with your actual backend API');
             } else {
                 console.log('=== PRODUCTION MODE ===');
-                console.log('Connected to:', API_BASE_URL);
+                console.log('API Base URL:', API_BASE_URL);
+                console.log('Connection Status:', isConnected ? 'Connected' : 'Failed');
             }
         });
     </script>
