@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance Exercise Study</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .user-id-display {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .user-id-display h2 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .user-id-display .id-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .entry-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .duration-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 1rem;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .nav-btn {
+            background: #6c757d;
+            width: auto;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            font-size: 1rem;
+        }
+
+        .nav-btn:hover {
+            background: #5a6268;
+        }
+
+        .entries-list {
+            margin-top: 20px;
+        }
+
+        .entry-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .entry-item h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .entry-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .connection-status {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .connection-status.offline {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .connection-status.online {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .duration-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status">
+            🔄 Checking connection...
+        </div>
+
+        <!-- Registration Page -->
+        <div id="registrationPage">
+            <h1>Balance Exercise Study</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Welcome to our research study. Please provide some basic information to get started.
+            </p>
+            
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" min="18" max="120" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Please select...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Create a Password:</label>
+                <input type="password" id="password" name="password" minlength="6" required>
+                <small style="color: #666;">At least 6 characters</small>
+            </div>
+            
+            <button type="button" id="registerBtn">
+                <span id="registerBtnText">Register</span>
+            </button>
+        </div>
+
+        <!-- User ID Display -->
+        <div id="userIdPage" class="hidden">
+            <h1>Registration Complete!</h1>
+            
+            <div class="user-id-display">
+                <h2>Your Study ID</h2>
+                <div class="id-value" id="displayUserId"></div>
+                <button class="copy-btn" onclick="copyUserId()">Copy ID</button>
+                <button class="copy-btn" onclick="downloadUserId()">Download ID</button>
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ IMPORTANT:</strong> Please save this ID! You will need it to log in each day. 
+                This ID will not be shown again after you leave this page.
+            </div>
+            
+            <button onclick="goToLogin()">Continue to Login</button>
+        </div>
+
+        <!-- Login Page -->
+        <div id="loginPage" class="hidden">
+            <h1>Daily Login</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Please enter your Study ID and password to log your daily balance exercises.
+            </p>
+            
+            <div class="form-group">
+                <label for="loginUserId">Study ID:</label>
+                <input type="text" id="loginUserId" name="userId" placeholder="e.g., P-1234" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" name="password" required>
+            </div>
+            
+            <button type="button" id="loginBtn">
+                <span id="loginBtnText">Login</span>
+            </button>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="nav-btn" onclick="showRegistration()">New Participant</button>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="hidden">
+            <h1>Daily Balance Log</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                Welcome back! Log your balance exercises below.
+            </p>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3 id="todayCount">0</h3>
+                    <p>Today's Entries</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalCount">0</h3>
+                    <p>Total Entries</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="studyDays">0</h3>
+                    <p>Study Days</p>
+                </div>
+            </div>
+            
+            <div class="entry-form">
+                <h3 style="margin-bottom: 20px;">Log New Exercise</h3>
+                <form id="entryForm">
+                    <div class="duration-inputs">
+                        <div class="form-group">
+                            <label for="leftLegDuration">Left Leg (seconds):</label>
+                            <input type="number" id="leftLegDuration" name="leftLegDuration" min="0" max="300" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="rightLegDuration">Right Leg (seconds):</label>
+                            <input type="number" id="rightLegDuration" name="rightLegDuration" min="0" max="300" step="0.1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="comments">Comments (optional):</label>
+                        <textarea id="comments" name="comments" rows="3" placeholder="How did you feel? Any difficulties?"></textarea>
+                    </div>
+                    
+                    <button type="submit" id="submitEntryBtn">
+                        <span id="submitEntryBtnText">Log Exercise</span>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="entries-list">
+                <h3>Today's Entries</h3>
+                <div id="todayEntries"></div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="nav-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="message" class="hidden"></div>
+    </div>
+
+    <script>
+        // API Configuration - UPDATE THESE URLS TO YOUR BACKEND
+        const API_BASE_URL = 'https://your-api-endpoint.com/api'; // Replace with your actual API URL
+        const API_ENDPOINTS = {
+            register: `${API_BASE_URL}/register`,
+            login: `${API_BASE_URL}/login`,
+            entries: `${API_BASE_URL}/entries`,
+            userStats: `${API_BASE_URL}/user-stats`
+        };
+
+        // Demo mode flag - set to false when you have a real backend
+        const DEMO_MODE = true;
+
+        // Current user session
+        let currentUser = null;
+
+        // Utility functions
+        function generateUserId() {
+            return 'P-' + Math.floor(1000 + Math.random() * 9000);
+        }
+
+        function getCurrentDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString();
+        }
+
+        function showMessage(text, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = type;
+            messageDiv.textContent = text;
+            messageDiv.classList.remove('hidden');
+            
+            const visibleContainer = document.querySelector('.container > div:not(.hidden)');
+            if (visibleContainer) {
+                visibleContainer.insertBefore(messageDiv, visibleContainer.firstChild);
+            }
+            
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        function showPage(pageId) {
+            const pages = ['registrationPage', 'userIdPage', 'loginPage', 'dashboard'];
+            pages.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        function setButtonLoading(buttonId, textId, loading = true) {
+            const button = document.getElementById(buttonId);
+            const text = document.getElementById(textId);
+            
+            if (loading) {
+                button.disabled = true;
+                text.innerHTML = '<div class="loading-spinner"></div>Processing...';
+            } else {
+                button.disabled = false;
+                text.textContent = buttonId === 'registerBtn' ? 'Register' : 
+                                   buttonId === 'loginBtn' ? 'Login' : 'Log Exercise';
+            }
+        }
+
+        // API functions
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            if (DEMO_MODE) {
+                return handleDemoMode(endpoint, method, data);
+            }
+
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                if (currentUser && currentUser.token) {
+                    options.headers['Authorization'] = `Bearer ${currentUser.token}`;
+                }
+
+                const response = await fetch(endpoint, options);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+        // Demo mode handler (remove this when you have a real backend)
+        function handleDemoMode(endpoint, method, data) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (endpoint.includes('/register')) {
+                        if (data.userId === 'P-1234') {
+                            reject(new Error('User ID already exists'));
+                        } else {
+                            resolve({ success: true, userId: data.userId });
+                        }
+                    } else if (endpoint.includes('/login')) {
+                        if (data.userId === 'P-1234' && data.password === 'demo123') {
+                            resolve({ 
+                                success: true, 
+                                userId: 'P-1234',
+                                token: 'demo-token-123'
+                            });
+                        } else {
+                            reject(new Error('Invalid credentials'));
+                        }
+                    } else if (endpoint.includes('/entries')) {
+                        if (method === 'POST') {
+                            resolve({ success: true, entryId: Date.now() });
+                        } else {
+                            resolve({
+                                todayCount: Math.floor(Math.random() * 5),
+                                totalCount: Math.floor(Math.random() * 50) + 10,
+                                studyDays: Math.floor(Math.random() * 20) + 5,
+                                todayEntries: [
+                                    {
+                                        time: '09:30:00',
+                                        leftLegDuration: 15.5,
+                                        rightLegDuration: 12.3,
+                                        comments: 'Felt good today'
+                                    }
+                                ]
+                            });
+                        }
+                    }
+                }, 1000); // Simulate network delay
+            });
+        }
+
+        // Connection status
+        async function checkConnection() {
+            const statusDiv = document.getElementById('connectionStatus');
+            
+            if (DEMO_MODE) {
+                statusDiv.textContent = '🧪 Demo Mode - Data will not be saved permanently';
+                statusDiv.className = 'connection-status';
+                return true;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    statusDiv.textContent = '🟢 Connected to research database';
+                    statusDiv.className = 'connection-status online';
+                    return true;
+                }
+            } catch (error) {
+                statusDiv.textContent = '🔴 Cannot connect to research database';
+                statusDiv.className = 'connection-status offline';
+                return false;
+            }
+        }
+
+        // Registration
+        async function handleRegistration() {
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const password = document.getElementById('password').value;
+            
+            if (!age || !gender || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            setButtonLoading('registerBtn', 'registerBtnText', true);
+            
+            try {
+                const userId = generateUserId();
+                const userData = {
+                    userId: userId,
+                    age: parseInt(age),
+                    gender: gender,
+                    password: password,
+                    createdAt: new Date().toISOString()
+                };
+                
+                const response = await apiCall(API_ENDPOINTS.register, 'POST', userData);
+                
+                if (response.success) {
+                    document.getElementById('displayUserId').textContent = userId;
+                    showPage('userIdPage');
+                    
+                    // Clear form
+                    document.getElementById('age').value = '';
+                    document.getElementById('gender').value = '';
+                    document.getElementById('password').value = '';
+                    
+                    showMessage('Registration successful!');
+                } else {
+                    throw new Error('Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration failed:', error);
+                showMessage('Registration failed. Please try again.', 'error');
+            } finally {
+                setButtonLoading('registerBtn', 'registerBtnText', false);
+            }
+        }
+
+        // Login
+        async function handleLogin() {
+            const userId = document.getElementById('loginUserId').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!userId || !password) {
+                showMessage('Please enter both Study ID and Password', 'error');
+                return;
+            }
+
+            setButtonLoading('loginBtn', 'loginBtnText', true);
+            
+            try {
+                const loginData = { userId, password };
+                const response = await apiCall(API_ENDPOINTS.login, 'POST', loginData);
+                
+                if (response.success) {
+                    currentUser = {
+                        userId: response.userId,
+                        token: response.token
+                    };
+                    
+                    await updateDashboard();
+                    showPage('dashboard');
+                    
+                    // Clear form
+                    document.getElementById('loginUserId').value = '';
+                    document.getElementById('loginPassword').value = '';
+                    
+                    showMessage('Login successful!');
+                } else {
+                    throw new Error('Login failed');
+                }
+            } catch (error) {
+                console.error('Login failed:', error);
+                showMessage('Invalid Study ID or Password', 'error');
+            } finally {
+                setButtonLoading('loginBtn', 'loginBtnText', false);
+            }
+        }
+
+        // Dashboard
+        async function updateDashboard() {
+            if (!currentUser) return;
+            
+            try {
+                const stats = await apiCall(`${API_ENDPOINTS.userStats}/${currentUser.userId}`);
+                
+                document.getElementById('todayCount').textContent = stats.todayCount;
+                document.getElementById('totalCount').textContent = stats.totalCount;
+                document.getElementById('studyDays').textContent = stats.studyDays;
+                
+                displayTodayEntries(stats.todayEntries || []);
+            } catch (error) {
+                console.error('Failed to update dashboard:', error);
+                showMessage('Failed to load dashboard data', 'error');
+            }
+        }
+
+        function displayTodayEntries(todayEntries) {
+            const container = document.getElementById('todayEntries');
+            
+            if (todayEntries.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No entries yet today</p>';
+                return;
+            }
+            
+            container.innerHTML = todayEntries.map((entry, index) => `
+                <div class="entry-item">
+                    <h4>Entry ${index + 1} - ${entry.time}</h4>
+                    <div class="entry-details">
+                        <p><strong>Left Leg:</strong> ${entry.leftLegDuration}s</p>
+                        <p><strong>Right Leg:</strong> ${entry.rightLegDuration}s</p>
+                        ${entry.comments ? `<p><strong>Comments:</strong> ${entry.comments}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Entry submission
+        async function handleEntrySubmission(e) {
+            e.preventDefault();
+            
+            if (!currentUser) return;
+
+            const leftLegDuration = parseFloat(document.getElementById('leftLegDuration').value);
+            const rightLegDuration = parseFloat(document.getElementById('rightLegDuration').value);
+            const comments = document.getElementById('comments').value.trim();
+
+            setButtonLoading('submitEntryBtn', 'submitEntryBtnText', true);
+            
+            try {
+                const entryData = {
+                    userId: currentUser.userId,
+                    date: getCurrentDate(),
+                    time: getCurrentTime(),
+                    timestamp: new Date().toISOString(),
+                    leftLegDuration: leftLegDuration,
+                    rightLegDuration: rightLegDuration,
+                    comments: comments
+                };
+                
+                const response = await apiCall(API_ENDPOINTS.entries, 'POST', entryData);
+                
+                if (response.success) {
+                    showMessage('Exercise logged successfully!');
+                    await updateDashboard();
+                    
+                    // Clear form
+                    document.getElementById('entryForm').reset();
+                } else {
+                    throw new Error('Failed to log entry');
+                }
+            } catch (error) {
+                console.error('Failed to log entry:', error);
+                if (error.message.includes('limit')) {
+                    showMessage('You have reached the daily entry limit. Come back tomorrow!', 'error');
+                } else {
+                    showMessage('Failed to log exercise. Please try again.', 'error');
+                }
+            } finally {
+                setButtonLoading('submitEntryBtn', 'submitEntryBtnText', false);
+            }
+        }
+
+        // Utility functions for user ID display
+        function copyUserId() {
+            const userId = document.getElementById('displayUserId').textContent;
+            navigator.clipboard.writeText(userId).then(() => {
+                showMessage('User ID copied to clipboard!');
+            }).catch(() => {
+                showMessage('Please manually copy your ID', 'error');
+            });
+        }
+
+        function downloadUserId() {
+            const userId = document.getElementById('displayUserId').textContent;
+            const blob = new Blob([`Your Balance Study ID: ${userId}\n\nPlease save this ID - you will need it to log in each day.`], 
+                { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `balance-study-id-${userId}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function goToLogin() {
+            showPage('loginPage');
+        }
+
+        function showRegistration() {
+            showPage('registrationPage');
+        }
+
+        function logout() {
+            currentUser = null;
+            showPage('loginPage');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Initializing Balance Research App...');
+            
+            // Check connection status
+            await checkConnection();
+            
+            // Set up event handlers
+            document.getElementById('registerBtn').addEventListener('click', handleRegistration);
+            document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            document.getElementById('entryForm').addEventListener('submit', handleEntrySubmission);
+            
+            // Show initial page
+            showPage('registrationPage');
+            
+            // Display researcher instructions
+            if (DEMO_MODE) {
+                console.log('=== DEMO MODE ACTIVE ===');
+                console.log('Demo login: ID=P-1234, Password=demo123');
+                console.log('Replace DEMO_MODE with your actual backend API');
+            } else {
+                console.log('=== PRODUCTION MODE ===');
+                console.log('Connected to:', API_BASE_URL);
+            }
+        });
+    </script>
+</body>
+</html>
